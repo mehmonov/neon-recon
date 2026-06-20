@@ -26,16 +26,18 @@ export class Input {
   private moveStick: Stick | null = null;
   private aimStick: Stick | null = null;
 
-  constructor(target: Window = window) {
-    target.addEventListener('keydown', (e) => this.keys.add(e.key.toLowerCase()));
-    target.addEventListener('keyup', (e) => this.keys.delete(e.key.toLowerCase()));
-    target.addEventListener('mousemove', (e) => {
+  // Touch listeners go on the canvas (not window) so taps on the HTML menu/pause
+  // buttons are NOT swallowed by preventDefault — critical for mobile.
+  constructor(touchTarget: HTMLElement, win: Window = window) {
+    win.addEventListener('keydown', (e) => this.keys.add(e.key.toLowerCase()));
+    win.addEventListener('keyup', (e) => this.keys.delete(e.key.toLowerCase()));
+    win.addEventListener('mousemove', (e) => {
       this.mouse = { x: e.clientX, y: e.clientY };
     });
-    target.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
-    target.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
-    target.addEventListener('touchend', (e) => this.onTouchEnd(e));
-    target.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
+    touchTarget.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+    touchTarget.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+    touchTarget.addEventListener('touchend', (e) => this.onTouchEnd(e));
+    touchTarget.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
   }
 
   private onTouchStart(e: TouchEvent): void {

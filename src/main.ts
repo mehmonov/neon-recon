@@ -13,22 +13,41 @@ import { CONFIG } from './config';
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
-
-function resize(): void {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
+const rotateEl = document.getElementById('screen-rotate') as HTMLElement;
 
 const assets = loadAssets();
 const game = new Game(loadLevel1());
 const camera = new Camera(canvas.width, canvas.height);
-const input = new Input();
+const input = new Input(canvas);
 const renderer = new Renderer(ctx, assets);
 const fog = new FogRenderer();
 const hud = new Hud(assets);
 const screens = new Screens(game);
+
+let pausedByRotation = false;
+
+function checkOrientation(): void {
+  const portrait = window.innerHeight > window.innerWidth;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  const blocked = portrait && coarse;
+  rotateEl.style.display = blocked ? 'flex' : 'none';
+  if (blocked && game.state === 'playing') {
+    game.pause();
+    pausedByRotation = true;
+  } else if (!blocked && pausedByRotation && game.state === 'paused') {
+    game.resume();
+    pausedByRotation = false;
+  }
+}
+
+function resize(): void {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  checkOrientation();
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+resize();
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {

@@ -18,7 +18,7 @@
       .screen {
         position: absolute; inset: 0; display: none;
         flex-direction: column; align-items: center; justify-content: center; gap: 16px;
-        background: rgba(5, 7, 11, 0.82); text-align: center; padding: 24px;
+        background: rgba(5, 7, 11, 0.82); text-align: center; padding: 24px; z-index: 50;
       }
       .screen h1 { margin: 0; font-size: 42px; font-weight: 600; letter-spacing: 2px; }
       .screen .tag { color: var(--muted); margin: 0 0 6px; max-width: 320px; line-height: 1.5; }
@@ -31,11 +31,14 @@
       #btn-pause {
         position: absolute; top: 14px; right: 14px; display: none;
         width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2a3340;
-        background: rgba(14, 20, 28, 0.7); color: var(--text); font-size: 16px; cursor: pointer;
+        background: rgba(14, 20, 28, 0.7); color: var(--text); font-size: 16px; cursor: pointer; z-index: 60;
       }
       .hint { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
       #screen-menu { background-image: linear-gradient(rgba(5, 7, 11, 0.55), rgba(5, 7, 11, 0.84)), url('/assets/menu_bg.jpg'); background-size: cover; background-position: center; }
       #logo { width: min(82%, 420px); height: auto; margin-bottom: 4px; }
+      #screen-rotate { z-index: 100; background: rgba(5, 7, 11, 0.95); gap: 14px; }
+      #screen-rotate svg { animation: tilt 1.7s ease-in-out infinite; transform-origin: center; }
+      @keyframes tilt { 0%, 100% { transform: rotate(-12deg); } 55% { transform: rotate(78deg); } }
     </style>
   </head>
   <body>
@@ -44,7 +47,7 @@
 
     <div id="screen-menu" class="screen">
       <img id="logo" src="/assets/logo.png" alt="NEON RECON" />
-      <p class="tag">Konusingizga tushgan dushmanlarni toping va yo'q qiling. Hammasini tugatsangiz — g'alaba.</p>
+      <p class="tag">Dushmanlarni yo'qoting, jon to'plab va yutasiz.</p>
       <button id="btn-play" class="btn">O'ynash</button>
       <p class="hint">PC: WASD + sichqoncha &nbsp;·&nbsp; Telefon: ikki joystick</p>
     </div>
@@ -65,6 +68,15 @@
       <h1 style="color: var(--green)">G'alaba!</h1>
       <p id="win-score" class="score">Ball: 0</p>
       <button id="btn-again" class="btn">Yana o'ynash</button>
+    </div>
+
+    <div id="screen-rotate" class="screen">
+      <svg width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="#2be0c6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="8" y="2.5" width="8" height="19" rx="2" />
+        <line x1="10.5" y1="5" x2="13.5" y2="5" />
+      </svg>
+      <h1 style="font-size: 24px;">Telefonni yon tomonga buring</h1>
+      <p class="tag">O'yin gorizontal (landscape) rejimda o'ynaladi.</p>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
