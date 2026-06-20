@@ -35,6 +35,28 @@ export function parseLevel(rows: string[]): LevelData {
   return { map: new TileMap(cols, rows.length, tiles), playerSpawn, enemySpawns, pickupSpawns };
 }
 
+// Ordered list of candidate enemy positions: hand-placed E markers first, then every
+// open floor tile at least 4 tiles from the player. Game slices the first N for the
+// chosen enemy count, so counts beyond the markers still get sensible spots.
+export function buildEnemyPool(level: LevelData): Vec2[] {
+  const { map, playerSpawn } = level;
+  const pc = Math.floor(playerSpawn.x / TILE);
+  const pr = Math.floor(playerSpawn.y / TILE);
+  const pool: Vec2[] = level.enemySpawns.map((s) => ({ x: s.x, y: s.y }));
+  const used = new Set(level.enemySpawns.map((s) => `${Math.floor(s.x / TILE)},${Math.floor(s.y / TILE)}`));
+  for (let r = 0; r < map.rows; r++) {
+    for (let c = 0; c < map.cols; c++) {
+      if (map.isWall(c, r)) continue;
+      const key = `${c},${r}`;
+      if (used.has(key)) continue;
+      if (Math.abs(c - pc) + Math.abs(r - pr) < 4) continue;
+      pool.push({ x: c * TILE + TILE / 2, y: r * TILE + TILE / 2 });
+      used.add(key);
+    }
+  }
+  return pool;
+}
+
 export const LEVEL_1: string[] = [
   '####################',
   '#P.......#.....E...#',

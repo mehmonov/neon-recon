@@ -6,6 +6,7 @@ import { Renderer } from './render/Renderer';
 import { FogRenderer } from './render/FogRenderer';
 import { Hud } from './render/Hud';
 import { Screens } from './ui/Screens';
+import { SettingsPanel } from './ui/SettingsPanel';
 import { GameLoop } from './core/loop';
 import { castConeRays, HALF_ANGLE, isVisible } from './world/Fov';
 import { loadAssets } from './render/assets';
@@ -23,6 +24,7 @@ const renderer = new Renderer(ctx, assets);
 const fog = new FogRenderer();
 const hud = new Hud(assets);
 const screens = new Screens(game);
+const settingsPanel = new SettingsPanel(game);
 
 let pausedByRotation = false;
 
@@ -48,6 +50,18 @@ function resize(): void {
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', resize);
 resize();
+
+// Fullscreen needs a user gesture, so request it on the first tap while in landscape on a phone.
+function enterFullscreenMaybe(): void {
+  if (!window.matchMedia('(pointer: coarse)').matches) return;
+  if (window.innerHeight > window.innerWidth) return;
+  if (document.fullscreenElement) return;
+  const el = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => void };
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+window.addEventListener('click', enterFullscreenMaybe);
+canvas.addEventListener('touchend', enterFullscreenMaybe);
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
@@ -88,6 +102,7 @@ function render(): void {
 
   if (game.state === 'playing' || game.state === 'paused') hud.draw(ctx, game, input);
   screens.sync();
+  settingsPanel.syncGear();
 }
 
 new GameLoop(1 / 60, (dt) => game.update(dt, input, canvas.width, canvas.height), render).start();

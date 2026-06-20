@@ -1,4 +1,4 @@
-import { Vec2, normalize, scale, length, angleOf } from '../core/Vec2';
+import { Vec2, normalize, scale } from '../core/Vec2';
 import { TileMap } from '../world/TileMap';
 import { CONFIG } from '../config';
 import { moveCircle } from './physics';
@@ -7,7 +7,8 @@ import { Weapon } from './Weapon';
 export class Player {
   pos: Vec2;
   hp: number;
-  aim: number; // radians
+  aim: number; // radians (rotated toward the target by Game at turnSpeed)
+  speed: number = CONFIG.player.speed;
   readonly radius = CONFIG.player.radius;
   readonly weapon = new Weapon();
 
@@ -18,8 +19,7 @@ export class Player {
   }
 
   update(dt: number, dir: Vec2, map: TileMap): void {
-    moveCircle(this.pos, scale(normalize(dir), CONFIG.player.speed * dt), this.radius, map);
-    if (length(dir) > 0) this.aim = angleOf(dir);
+    moveCircle(this.pos, scale(normalize(dir), this.speed * dt), this.radius, map);
     this.weapon.update(dt);
   }
 }

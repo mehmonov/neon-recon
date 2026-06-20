@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLevel } from '../src/world/Level';
+import { parseLevel, buildEnemyPool } from '../src/world/Level';
 import { TILE } from '../src/config';
 
 describe('parseLevel', () => {
@@ -14,5 +14,12 @@ describe('parseLevel', () => {
   });
   it('places player spawn at P center', () => {
     expect(lvl.playerSpawn).toEqual({ x: TILE * 1.5, y: TILE * 1.5 });
+  });
+
+  it('buildEnemyPool lists E markers first', () => {
+    const l = parseLevel(['#######', '#P..E.#', '#.....#', '#######']);
+    const pool = buildEnemyPool(l);
+    expect(pool.length).toBeGreaterThan(0);
+    expect(pool[0]).toEqual(l.enemySpawns[0]);
   });
 });

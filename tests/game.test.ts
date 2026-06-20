@@ -43,4 +43,12 @@ describe('Game', () => {
     g.update(0.1, stubInput, 800, 600);
     expect(g.state).toBe('gameover');
   });
+
+  it('applySettings sets player speed and enemy count', () => {
+    const g = new Game(parseLevel(['#########', '#P......#', '#.......#', '#.......#', '#########']));
+    g.applySettings({ moveSpeed: 150, turnSpeed: 360, enemyCount: 3 });
+    g.start();
+    expect(g.player.speed).toBe(150);
+    expect(g.enemies.length).toBe(3);
+  });
 });

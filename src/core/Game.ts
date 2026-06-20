@@ -2,10 +2,14 @@ import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { Bullet } from '../entities/Bullet';
 import { Pickup } from '../entities/Pickup';
-import { LevelData } from '../world/Level';
+import { LevelData, buildEnemyPool } from '../world/Level';
 import { nearestVisibleEnemy, circleHit } from '../systems/Combat';
+import { angleDiff } from '../world/Fov';
 import { Vec2, angleOf, sub, distance } from './Vec2';
 import { CONFIG, TILE } from '../config';
+import { Settings } from './Settings';
+
+const DEG = Math.PI / 180;
 
 export type GameState = 'menu' | 'playing' | 'paused' | 'gameover' | 'victory';
 
@@ -22,13 +26,29 @@ export class Game {
   pickups!: Pickup[];
   score = 0;
 
+  moveSpeed: number = CONFIG.player.speed;
+  turnSpeed = 720 * DEG; // rad/s
+  enemyCount: number = CONFIG.enemy.count;
+
+  private readonly pool: Vec2[];
+
   constructor(readonly level: LevelData) {
+    this.pool = buildEnemyPool(level);
     this.reset();
+  }
+
+  applySettings(s: Settings): void {
+    this.moveSpeed = s.moveSpeed;
+    this.turnSpeed = s.turnSpeed * DEG;
+    this.enemyCount = s.enemyCount;
+    if (this.player) this.player.speed = this.moveSpeed;
   }
 
   reset(): void {
     this.player = new Player(this.level.playerSpawn);
-    this.enemies = this.level.enemySpawns.map((s) => new Enemy(s));
+    this.player.speed = this.moveSpeed;
+    const n = Math.min(this.enemyCount, this.pool.length);
+    this.enemies = this.pool.slice(0, n).map((p) => new Enemy(p));
     this.bullets = [];
     this.pickups = this.level.pickupSpawns.map((p) => new Pickup(p.pos, p.kind));
     this.score = 0;
@@ -56,9 +76,16 @@ export class Game {
     const map = this.level.map;
     const player = this.player;
 
-    player.update(dt, input.moveDir(), map);
-    const aim = input.aim(viewW / 2, viewH / 2);
-    if (aim !== null) player.aim = aim;
+    const dir = input.moveDir();
+    player.update(dt, dir, map);
+
+    let target = input.aim(viewW / 2, viewH / 2);
+    if (target === null && (dir.x !== 0 || dir.y !== 0)) target = Math.atan2(dir.y, dir.x);
+    if (target !== null) {
+      const diff = angleDiff(player.aim, target);
+      const step = this.turnSpeed * dt;
+      player.aim = Math.abs(diff) <= step ? target : player.aim + Math.sign(diff) * step;
+    }
 
     for (const e of this.enemies) {
       e.update(dt, player, map, (pos, angle) => this.spawnEnemyBullet(pos, angle));
