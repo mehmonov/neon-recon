@@ -12,13 +12,22 @@ export function dirFromKeys(keys: ReadonlySet<string>): Vec2 {
 
 export class Input {
   private keys = new Set<string>();
+  private mouse: Vec2 | null = null;
 
   constructor(target: Window = window) {
     target.addEventListener('keydown', (e) => this.keys.add(e.key.toLowerCase()));
     target.addEventListener('keyup', (e) => this.keys.delete(e.key.toLowerCase()));
+    target.addEventListener('mousemove', (e) => {
+      this.mouse = { x: e.clientX, y: e.clientY };
+    });
   }
 
   moveDir(): Vec2 {
     return dirFromKeys(this.keys);
+  }
+
+  aimFromCenter(cx: number, cy: number): number | null {
+    if (!this.mouse) return null;
+    return Math.atan2(this.mouse.y - cy, this.mouse.x - cx);
   }
 }

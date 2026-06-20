@@ -14,7 +14,7 @@ const COLORS = {
 export class Renderer {
   constructor(private ctx: CanvasRenderingContext2D) {}
 
-  draw(map: TileMap, player: Player, cam: Camera): void {
+  drawWorld(map: TileMap, cam: Camera): void {
     const ctx = this.ctx;
     const w = ctx.canvas.width;
     const h = ctx.canvas.height;
@@ -38,8 +38,12 @@ export class Renderer {
         ctx.strokeRect(s.x + 0.5, s.y + 0.5, TILE - 1, TILE - 1);
       }
     }
+  }
 
+  drawPlayer(player: Player, cam: Camera): void {
+    const ctx = this.ctx;
     const p = cam.worldToScreen(player.pos);
+
     ctx.fillStyle = COLORS.player;
     ctx.beginPath();
     ctx.arc(p.x, p.y, player.radius, 0, Math.PI * 2);
