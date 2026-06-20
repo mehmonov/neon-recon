@@ -3,6 +3,7 @@ import { Camera } from '../core/Camera';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { Bullet } from '../entities/Bullet';
+import { Pickup } from '../entities/Pickup';
 import { TILE } from '../config';
 
 const COLORS = {
@@ -15,6 +16,9 @@ const COLORS = {
   enemyCore: '#FFE0E4',
   bulletPlayer: '#7FFFE0',
   bulletEnemy: '#FF8A93',
+  pickupBox: '#15202A',
+  pickupHealth: '#FF5C7A',
+  pickupAmmo: '#FFB23D',
 };
 
 export class Renderer {
@@ -42,6 +46,27 @@ export class Renderer {
         ctx.strokeStyle = COLORS.wallEdge;
         ctx.lineWidth = 1;
         ctx.strokeRect(s.x + 0.5, s.y + 0.5, TILE - 1, TILE - 1);
+      }
+    }
+  }
+
+  drawPickups(pickups: ReadonlyArray<Pickup>, cam: Camera): void {
+    const ctx = this.ctx;
+    for (const p of pickups) {
+      if (!p.active) continue;
+      const s = cam.worldToScreen(p.pos);
+      const col = p.kind === 'health' ? COLORS.pickupHealth : COLORS.pickupAmmo;
+      ctx.fillStyle = COLORS.pickupBox;
+      ctx.fillRect(s.x - 9, s.y - 9, 18, 18);
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(s.x - 9, s.y - 9, 18, 18);
+      ctx.fillStyle = col;
+      if (p.kind === 'health') {
+        ctx.fillRect(s.x - 1.5, s.y - 6, 3, 12);
+        ctx.fillRect(s.x - 6, s.y - 1.5, 12, 3);
+      } else {
+        ctx.fillRect(s.x - 1.5, s.y - 5, 3, 10);
       }
     }
   }
