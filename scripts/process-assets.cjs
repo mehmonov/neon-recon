@@ -6,7 +6,7 @@ const path = require('path');
 const { PNG } = require('pngjs');
 
 const DIR = path.join(__dirname, '..', 'public', 'assets');
-const BACKUP = path.join(DIR, '_originals');
+const BACKUP = path.join(__dirname, '..', '.asset-originals');
 fs.mkdirSync(BACKUP, { recursive: true });
 
 const JOBS = [
