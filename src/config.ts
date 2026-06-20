@@ -24,6 +24,7 @@ export const CONFIG = {
     radius: 12,
     preferredDist: 3 * TILE,
   },
+  pickup: { healthAmount: 40, ammoAmount: 30 },
   pickupRespawnSec: 15,
   scorePerKill: 100,
 } as const;
