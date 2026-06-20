@@ -8,6 +8,7 @@ import { Hud } from './render/Hud';
 import { Screens } from './ui/Screens';
 import { GameLoop } from './core/loop';
 import { castConeRays, HALF_ANGLE, isVisible } from './world/Fov';
+import { loadAssets } from './render/assets';
 import { CONFIG } from './config';
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
@@ -20,12 +21,13 @@ function resize(): void {
 window.addEventListener('resize', resize);
 resize();
 
+const assets = loadAssets();
 const game = new Game(loadLevel1());
 const camera = new Camera(canvas.width, canvas.height);
 const input = new Input();
-const renderer = new Renderer(ctx);
+const renderer = new Renderer(ctx, assets);
 const fog = new FogRenderer();
-const hud = new Hud();
+const hud = new Hud(assets);
 const screens = new Screens(game);
 
 window.addEventListener('keydown', (e) => {
