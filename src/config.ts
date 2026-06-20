@@ -13,7 +13,17 @@ export const CONFIG = {
     damage: 12,
     bulletRadius: 3,
   },
-  enemy: { hp: 60, count: 5, speed: 120 },
+  enemy: {
+    hp: 60,
+    count: 5,
+    speed: 120,
+    visionRange: 5 * TILE,
+    fireRate: 1.5,
+    damage: 8,
+    bulletSpeed: 420,
+    radius: 12,
+    preferredDist: 3 * TILE,
+  },
   pickupRespawnSec: 15,
   scorePerKill: 100,
 } as const;
