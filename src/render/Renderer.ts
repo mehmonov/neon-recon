@@ -1,6 +1,8 @@
 import { TileMap } from '../world/TileMap';
 import { Camera } from '../core/Camera';
 import { Player } from '../entities/Player';
+import { Enemy } from '../entities/Enemy';
+import { Bullet } from '../entities/Bullet';
 import { TILE } from '../config';
 
 const COLORS = {
@@ -9,6 +11,10 @@ const COLORS = {
   wallEdge: '#223040',
   player: '#3DDC97',
   playerCore: '#EAFFF6',
+  enemy: '#FF4D5E',
+  enemyCore: '#FFE0E4',
+  bulletPlayer: '#7FFFE0',
+  bulletEnemy: '#FF8A93',
 };
 
 export class Renderer {
@@ -37,6 +43,33 @@ export class Renderer {
         ctx.lineWidth = 1;
         ctx.strokeRect(s.x + 0.5, s.y + 0.5, TILE - 1, TILE - 1);
       }
+    }
+  }
+
+  drawEnemies(enemies: ReadonlyArray<Enemy>, cam: Camera): void {
+    const ctx = this.ctx;
+    for (const e of enemies) {
+      if (!e.alive) continue;
+      const s = cam.worldToScreen(e.pos);
+      ctx.fillStyle = COLORS.enemy;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, e.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = COLORS.enemyCore;
+      ctx.beginPath();
+      ctx.arc(s.x + Math.cos(e.aim) * e.radius, s.y + Math.sin(e.aim) * e.radius, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  drawBullets(bullets: ReadonlyArray<Bullet>, cam: Camera): void {
+    const ctx = this.ctx;
+    for (const b of bullets) {
+      const s = cam.worldToScreen(b.pos);
+      ctx.fillStyle = b.team === 'player' ? COLORS.bulletPlayer : COLORS.bulletEnemy;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, b.radius + 1, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 
